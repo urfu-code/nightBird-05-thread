@@ -61,7 +61,6 @@ public class TheWoodServerThread implements Runnable {
 			else {
 				System.out.println("Мышь " + request.getName() + " нашла выход!");
 			}
-			
 		}
 		catch (IOException e) {
 			System.out.println("Ошибка связи");

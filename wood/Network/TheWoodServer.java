@@ -54,9 +54,7 @@ public class TheWoodServer {
 			try {
 				PrintableTheWood wood = (PrintableTheWood) loader.Load(new FileInputStream(file),System.out);
 				System.out.println("Waiting for connection...");
-				ArrayList<Thread> clients = new ArrayList<Thread>();
-				Object monitor = new Object();
-				TheWoodServerThreadSyncronizer sync = new TheWoodServerThreadSyncronizer(clients, monitor);
+				TheWoodServerThreadSyncronizer sync = new TheWoodServerThreadSyncronizer();
 				Thread threadSync = new Thread(sync);
 				threadSync.start();
 				server.setSoTimeout(1000);
@@ -70,14 +68,14 @@ public class TheWoodServer {
 						}
 						else {
 							writer.write("Чтобы остановить сервер введите stop и нажмите Enter\r\n");
+							writer.write("Client connected!");
 							writer.flush();
+							
 						}
 					}
 					try {
 						thread = new Thread(new TheWoodServerThread(server.accept(), wood, startEndPoints, sync));
-						clients.add(thread);
 						thread.start();
-						System.out.println(clients.size() + " clients connected!");
 					}
 					catch (SocketTimeoutException e) {
 						continue;
