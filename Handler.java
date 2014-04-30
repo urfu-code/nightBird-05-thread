@@ -17,8 +17,6 @@ public class Handler implements Runnable {
 
 	public Handler(Socket socket, PrintableWood wood, ArrayList<Point> starts, ArrayList<Point> finishes) {
 		this.pWood = wood;
-		//notify
-		// передавать потоку что-то на отрисовку
 		this.starts = starts;
 		this.finishes = finishes;
 
@@ -31,9 +29,6 @@ public class Handler implements Runnable {
 		Random chooseThePoint = new Random();
 		ObjectInputStream ois = null;
 		ObjectOutputStream oos = null;
-
-		//обрабатывать команды, отвечать, пинать отрисовывающий поток
-
 
 		try {
 			ois = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -70,9 +65,15 @@ public class Handler implements Runnable {
 		}
 		finally {
 			try {
-				ois.close();
-				oos.close();
-				socket.close();
+				if (ois != null) {
+					ois.close();
+				}
+				if (oos != null) {
+					oos.close();
+				}
+				if (socket != null) {
+					socket.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

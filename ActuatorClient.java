@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Scanner;
 
 
 public class ActuatorClient {
@@ -12,7 +13,11 @@ public class ActuatorClient {
 	private static ObjectInputStream ois;
 
 	public static void main(String[] args) throws IOException {
-		String name = "Norushka";
+		
+		@SuppressWarnings("resource")
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Input the name");
+		String name = sc.nextLine();
 		Mouse norushka = new Mouse(name);
 
 		sock = new Socket("localhost", 32015);

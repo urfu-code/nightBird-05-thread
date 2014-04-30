@@ -1,27 +1,27 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+//import java.io.BufferedReader;
+//import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+//import java.io.InputStreamReader;
+//import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
+//import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.util.ArrayList;
 
 
 public class WoodServerThread {
 
-	public WoodServerThread() {
-		// TODO Auto-generated constructor stub
-	}
-
 	PrintableWoodLoader wl;
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, URISyntaxException {
+		
+		CodeSource codeSource = WoodServerThread.class.getProtectionDomain().getCodeSource();
+		File file = new File(new File(codeSource.getLocation().toURI().getPath()).getParentFile().getPath(), "src/input.txt");
 
-		File file = new File("src/input.txt");
 		ArrayList<Point> starts = new ArrayList<>();
 		ArrayList<Point> finishes = new ArrayList<>();
 		ArrayList<Thread> listOfClients = new ArrayList<Thread>();
@@ -36,11 +36,11 @@ public class WoodServerThread {
 
 		try {
 			ServerSocket forClients = new ServerSocket(32015); // для создания сокетов и потоков-клиентов
-			ServerSocket ssforUser = new ServerSocket(32115);
-			Socket forUser = ssforUser.accept();
+//			ServerSocket ssforUser = new ServerSocket(32115);
+//			Socket forUser = ssforUser.accept();
 			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(forUser.getInputStream())); // нужно ли мне?
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(forUser.getOutputStream()));
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(forUser.getInputStream()));
+//			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(forUser.getOutputStream()));
 			
 			try {
 				FileInputStream stream = new FileInputStream(file);
@@ -53,17 +53,19 @@ public class WoodServerThread {
 				nottyThread.start();
 				
 				while (true) {
-					if (reader.ready()) {
-						if (reader.readLine().equals("Stop")) {
-							writer.write("Server stopped" + System.getProperty("line.separator"));
-							writer.flush();
-							return;
-						}
-					}
+//					if (reader.ready()) {
+//						if (reader.readLine().equals("Stop")) {
+//							writer.write("Server stopped" + System.getProperty("line.separator"));
+//							writer.flush();
+//							return;
+//						}
+//					}
 					try {
 						Thread th = new Thread(new Handler(forClients.accept(), wood, starts, finishes));
 						listOfClients.add(th);
 						th.start();
+						th.join();
+						System.out.println(listOfClients.size() + " clients!");
 					} catch (SocketTimeoutException  e) {
 						e.printStackTrace();
 					}
@@ -76,10 +78,10 @@ public class WoodServerThread {
 			
 			finally {
 				forClients.close();
-				ssforUser.close();
-				forUser.close();
-				reader.close();
-				writer.close();				
+//				ssforUser.close();
+//				forUser.close();
+//				reader.close();
+//				writer.close();				
 			}
 			
 			
