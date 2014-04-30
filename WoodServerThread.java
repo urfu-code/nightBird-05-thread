@@ -24,6 +24,7 @@ public class WoodServerThread {
 		File file = new File("src/input.txt");
 		ArrayList<Point> starts = new ArrayList<>();
 		ArrayList<Point> finishes = new ArrayList<>();
+		ArrayList<Thread> listOfClients = new ArrayList<Thread>();
 		starts.add(new Point(1, 1));
 		starts.add(new Point(5, 1));
 		starts.add(new Point(5, 4));
@@ -46,7 +47,7 @@ public class WoodServerThread {
 				PrintableWoodLoader wl = new PrintableWoodLoader();
 				PrintableWood wood = wl.Load(stream);
 				
-				ArrayList<Thread> listOfClients = new ArrayList<Thread>();
+				
 				Notifier notty = new Notifier(listOfClients);
 				Thread nottyThread = new Thread(notty);
 				nottyThread.start();
@@ -57,8 +58,6 @@ public class WoodServerThread {
 							writer.write("Server stopped" + System.getProperty("line.separator"));
 							writer.flush();
 							return;
-							// тут надо "убить" тред сервера
-							//break;
 						}
 					}
 					try {

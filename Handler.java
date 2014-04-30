@@ -1,8 +1,5 @@
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,8 +11,6 @@ import java.util.Random;
 public class Handler implements Runnable {
 
 	Socket socket;
-
-	WoodDrawingThread drawing;
 	private ArrayList<Point> starts;
 	private ArrayList<Point> finishes;
 	PrintableWood pWood; 
@@ -33,14 +28,16 @@ public class Handler implements Runnable {
 	public void run() {
 		Action act = Action.Ok;
 		int lifeCount = 3;
-		Random chooseThePoint = new Random();	
+		Random chooseThePoint = new Random();
+		ObjectInputStream ois = null;
+		ObjectOutputStream oos = null;
 
 		//обрабатывать команды, отвечать, пинать отрисовывающий поток
 
 
 		try {
-			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
-			ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+			ois = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+			oos = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 
 			do {
 				MessageToServer recieved = (MessageToServer) ois.readObject();
@@ -52,9 +49,13 @@ public class Handler implements Runnable {
 					break;
 				case "move":				
 					synchronized (pWood) {
-						pWood.move(recieved.getWoodmanName(),
-								recieved.getDirection());
+						act = pWood.move(recieved.getWoodmanName(), recieved.getDirection());
+						lifeCount = pWood.getWoodman(recieved.getWoodmanName()).GetLifeCount();
 					}
+					oos = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+					MessageToClient toSend = new MessageToClient(act, lifeCount);
+					oos.writeObject(toSend);
+					oos.flush();
 					break;
 				}
 			} while (act != Action.WoodmanNotFound && act != Action.Finish);
@@ -68,8 +69,13 @@ public class Handler implements Runnable {
 			e.printStackTrace();
 		}
 		finally {
-			ois.close();
-			oos.close();
+			try {
+				ois.close();
+				oos.close();
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
