@@ -1,16 +1,12 @@
-//import java.io.BufferedReader;
-//import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-//import java.io.InputStreamReader;
-//import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
-//import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class WoodServerThread {
@@ -36,11 +32,7 @@ public class WoodServerThread {
 
 		try {
 			ServerSocket forClients = new ServerSocket(32015); // для создания сокетов и потоков-клиентов
-//			ServerSocket ssforUser = new ServerSocket(32115);
-//			Socket forUser = ssforUser.accept();
 			
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(forUser.getInputStream()));
-//			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(forUser.getOutputStream()));
 			
 			try {
 				FileInputStream stream = new FileInputStream(file);
@@ -52,19 +44,24 @@ public class WoodServerThread {
 				Thread nottyThread = new Thread(notty);
 				nottyThread.start();
 				
+				@SuppressWarnings("resource")
+				Scanner sc = new Scanner(System.in);
 				while (true) {
-//					if (reader.ready()) {
-//						if (reader.readLine().equals("Stop")) {
-//							writer.write("Server stopped" + System.getProperty("line.separator"));
-//							writer.flush();
-//							return;
-//						}
-//					}
+					System.out.println("If you want to stop server, input \"Stop\" and press Enter. If you don't, press Enter");
+					if (sc.hasNextLine()) {
+						if (sc.nextLine().equals("Stop")) {
+							System.out.println("Server stopped" + System.getProperty("line.separator"));
+							System.exit(0);
+						}
+					}
 					try {
-						Thread th = new Thread(new Handler(forClients.accept(), wood, starts, finishes));
-						listOfClients.add(th);
+						Thread th = new Thread(new Handler(forClients.accept(), wood, starts, finishes, listOfClients));
+						
+						synchronized (listOfClients) {
+							listOfClients.add(th);
+						}					
 						th.start();
-						th.join();
+//						th.join();
 						System.out.println(listOfClients.size() + " clients!");
 					} catch (SocketTimeoutException  e) {
 						e.printStackTrace();
@@ -77,11 +74,7 @@ public class WoodServerThread {
 			}
 			
 			finally {
-				forClients.close();
-//				ssforUser.close();
-//				forUser.close();
-//				reader.close();
-//				writer.close();				
+				forClients.close();		
 			}
 			
 			

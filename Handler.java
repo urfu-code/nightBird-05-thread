@@ -10,16 +10,20 @@ import java.util.Random;
 
 public class Handler implements Runnable {
 
-	Socket socket;
+	private Socket socket;
 	private ArrayList<Point> starts;
 	private ArrayList<Point> finishes;
-	PrintableWood pWood; 
-
-	public Handler(Socket socket, PrintableWood wood, ArrayList<Point> starts, ArrayList<Point> finishes) {
+	private PrintableWood pWood; 
+	private ObjectInputStream ois;
+	private ObjectOutputStream oos;
+	ArrayList<Thread> listOfClients;
+	
+	public Handler(Socket socket, PrintableWood wood, ArrayList<Point> starts, ArrayList<Point> finishes, ArrayList<Thread> listOfClients) {
+		this.socket = socket;
 		this.pWood = wood;
 		this.starts = starts;
 		this.finishes = finishes;
-
+		this.listOfClients = listOfClients;
 	}
 
 	@Override
@@ -27,12 +31,10 @@ public class Handler implements Runnable {
 		Action act = Action.Ok;
 		int lifeCount = 3;
 		Random chooseThePoint = new Random();
-		ObjectInputStream ois = null;
-		ObjectOutputStream oos = null;
+
 
 		try {
 			ois = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
-			oos = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 
 			do {
 				MessageToServer recieved = (MessageToServer) ois.readObject();
@@ -77,6 +79,7 @@ public class Handler implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			listOfClients.remove(this);
 		}
 
 	}

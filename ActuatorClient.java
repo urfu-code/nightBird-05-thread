@@ -35,14 +35,13 @@ public class ActuatorClient {
 			MessageToServer moveItForMe = new MessageToServer("move", name, latestDirection);
 			oos.writeObject(moveItForMe);
 			oos.flush();
-
+			
 			ois = new ObjectInputStream(new BufferedInputStream(sock.getInputStream()));
 			try {
 				MessageToClient recieved = (MessageToClient) ois.readObject();
 				newAction = recieved.getAction();
 				newDirection = norushka.NextMove(newAction);
 				latestDirection = newDirection;
-				
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -50,14 +49,14 @@ public class ActuatorClient {
 		}
 
 		if (newAction == Action.WoodmanNotFound)
-			System.out.println("Мышь умерла");
+			System.out.println(name + " is dead");
 		if (newAction == Action.Finish)
-			System.out.println("Finish!");
+			System.out.println(name + " finished!");
 
-		try {
-			sock.close();		
+		try {				
 			ois.close();
 			oos.close();
+			sock.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
