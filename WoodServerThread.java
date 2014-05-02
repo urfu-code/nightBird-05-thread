@@ -23,12 +23,12 @@ public class WoodServerThread {
 		ArrayList<Point> starts = new ArrayList<>();
 		ArrayList<Point> finishes = new ArrayList<>();
 
-//		starts.add(new Point(1, 1));
-//		starts.add(new Point(5, 1));
-//		starts.add(new Point(5, 4));
+		starts.add(new Point(1, 1));
+		starts.add(new Point(5, 1));
+		starts.add(new Point(5, 4));
 		starts.add(new Point(4, 6));
-//		finishes.add(new Point(6, 6));
-//		finishes.add(new Point(7, 1));
+		finishes.add(new Point(6, 6));
+		finishes.add(new Point(7, 1));
 		finishes.add(new Point(1, 3));
 		finishes.add(new Point(6, 9));
 
