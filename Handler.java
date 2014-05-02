@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 
@@ -16,14 +17,16 @@ public class Handler implements Runnable {
 	private PrintableWood pWood; 
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
-	ArrayList<Thread> listOfClients;
+	private volatile HashMap<Integer, Thread> listOfClients;
+	private Integer threadID;
 	
-	public Handler(Socket socket, PrintableWood wood, ArrayList<Point> starts, ArrayList<Point> finishes, ArrayList<Thread> listOfClients) {
+	public Handler(Socket socket, PrintableWood wood, ArrayList<Point> starts, ArrayList<Point> finishes, HashMap<Integer, Thread> listOfClients, Integer threadID) {
 		this.socket = socket;
 		this.pWood = wood;
 		this.starts = starts;
 		this.finishes = finishes;
 		this.listOfClients = listOfClients;
+		this.threadID = threadID;
 	}
 
 	@Override
@@ -47,22 +50,39 @@ public class Handler implements Runnable {
 				case "move":				
 					synchronized (pWood) {
 						act = pWood.move(recieved.getWoodmanName(), recieved.getDirection());
-						lifeCount = pWood.getWoodman(recieved.getWoodmanName()).GetLifeCount();
+						if (act == Action.WoodmanNotFound && lifeCount == 0)
+							lifeCount = -1;
+						else
+							lifeCount = pWood.getWoodman(recieved.getWoodmanName()).GetLifeCount();
+						
+						
 					}
 					oos = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-					MessageToClient toSend = new MessageToClient(act, lifeCount);
+					
+					MessageToClient toSend;
+					synchronized (listOfClients.get(threadID)) {
+						toSend = new MessageToClient(act, lifeCount);
+						listOfClients.get(threadID).wait();
+						
+					}
 					oos.writeObject(toSend);
 					oos.flush();
 					break;
 				}
 			} while (act != Action.WoodmanNotFound && act != Action.Finish);
 
-
+			synchronized (listOfClients) {
+				if (act == Action.WoodmanNotFound || act == Action.Finish) {
+					listOfClients.remove(threadID);
+				}
+			}
 		} 
 
 		catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		finally {
@@ -79,7 +99,7 @@ public class Handler implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			listOfClients.remove(this);
+			
 		}
 
 	}

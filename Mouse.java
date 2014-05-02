@@ -77,7 +77,7 @@ public class Mouse implements IMouse {
 				nameOfAlghoritm = "The return";
 		}
 
-		if (!wayBackToPosition.empty() && nameOfAlghoritm == "The return") {
+		if (!wayBackToPosition.empty() && nameOfAlghoritm == "The return" && getEnegry == 0) {
 			wayFromLife.push(wayBackToPosition.peek()); // заполняем заново, вдруг снова придётся возвращаться
 			return wayBackToPosition.pop();
 		}
@@ -101,8 +101,10 @@ public class Mouse implements IMouse {
 		case Fail :
 			if (itKilledMe)
 				setLifeCount(-1);
-			if (getLifeCount() < 2)
+			if (getLifeCount() < 2) {
 				nameOfAlghoritm = "Back to life";
+				getEnegry = 4;
+			}
 			return ifThereIsWall(latestDirection);
 
 		case Life :

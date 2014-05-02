@@ -13,7 +13,7 @@ public class PrintableWoodLoader implements IWoodLoader {
 		try {
 			try {
 				@SuppressWarnings("resource")
-				Scanner sc = new Scanner(stream, "utf8");
+				Scanner sc = new Scanner(stream, "utf-8");
 				String labLine = "";
 				int numberOfLine = 0;
 				

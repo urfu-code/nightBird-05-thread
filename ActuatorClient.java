@@ -14,12 +14,17 @@ public class ActuatorClient {
 
 	public static void main(String[] args) throws IOException {
 		
-		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Input the name");
 		String name = sc.nextLine();
+		
 		Mouse norushka = new Mouse(name);
-
+		// чтобы успеть подключить всех клиентов
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		sock = new Socket("localhost", 32015);
 		oos = new ObjectOutputStream(new BufferedOutputStream(sock.getOutputStream()));
 
@@ -32,6 +37,7 @@ public class ActuatorClient {
 		Action newAction = Action.Ok;
 
 		while (!(newAction == Action.WoodmanNotFound) && !(newAction == Action.Finish)) {
+			
 			MessageToServer moveItForMe = new MessageToServer("move", name, latestDirection);
 			oos.writeObject(moveItForMe);
 			oos.flush();
@@ -53,7 +59,8 @@ public class ActuatorClient {
 		if (newAction == Action.Finish)
 			System.out.println(name + " finished!");
 
-		try {				
+		try {
+			sc.close();
 			ois.close();
 			oos.close();
 			sock.close();

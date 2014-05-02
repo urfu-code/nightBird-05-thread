@@ -1,10 +1,11 @@
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 
 public class Notifier implements Runnable {
-	private ArrayList<Thread> listOfClients;
+	private HashMap<Integer, Thread> listOfClients;
 
-	public Notifier(ArrayList<Thread> listOfClients) {
+	public Notifier(HashMap<Integer, Thread> listOfClients) {
 		this.listOfClients = listOfClients;
 	}
 
@@ -13,18 +14,21 @@ public class Notifier implements Runnable {
 
 		while (true) {			
 
-			for (int i = 0; i < listOfClients.size(); i++) {
-				synchronized (listOfClients.get(i)) {
-					listOfClients.get(i).notify();
+			Iterator<Integer> keySetIterator = listOfClients.keySet().iterator();
+			while (keySetIterator.hasNext()) {
+				Integer key = keySetIterator.next();
+				synchronized (listOfClients.get(key)) {
+					listOfClients.get(key).notify();
+				}		  
+
+
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			// печатать?
+
 		}
 
 	}
