@@ -39,14 +39,15 @@ public class Client extends Close {
 				m_response = (Response) in.readObject();
 				currentAction = m_response.GetAction();
 
-				if (currentAction == Action.WoodmanNotFound) {
+				
+			}
+			if (currentAction == Action.WoodmanNotFound) {
 					System.out.println("Woodman not found");
 				} 
 
 				if (currentAction == Action.Finish) {
 					System.out.println("You reached finish");
 				}
-			}		
 			System.out.println("Game over");
 		}
 		catch (IOException e) {
