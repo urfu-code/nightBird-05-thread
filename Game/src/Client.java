@@ -16,8 +16,8 @@ public class Client extends Close {
 		Request m_request;
 		Random random = new Random();
 		StringBuffer name = new StringBuffer();
-
-		socket = new Socket("localhost", 17826);			
+try {
+		socket = new Socket("localhost", 17396);			
 		out = new ObjectOutputStream(socket.getOutputStream());
 
 		for (int i = 0; i < 6; i++) {
@@ -29,7 +29,7 @@ public class Client extends Close {
 		out.writeObject(m_request);
 		out.flush();
 		Action currentAction = Action.Ok;
-		try {
+		
 			while ((currentAction != Action.Finish) && (currentAction != Action.WoodmanNotFound)) {
 				Direction direction = Minni.NextMove(currentAction);
 				Request message = new Request(name.toString(), direction);
