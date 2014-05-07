@@ -21,25 +21,22 @@ public class ThreadsServer extends Close implements Runnable  {
 		m_wood = wood;
 		points = p;
 		synchronizer = sync;
-		in = new ObjectInputStream(socket.getInputStream());
-		out = new ObjectOutputStream(socket.getOutputStream());
-	}
+		}
 
 	@Override
 	public void run() {
-		String currentRequest;
 		Action currentAction = Action.Ok;
 		Random random = new Random();
 		try {
-
+			in = new ObjectInputStream(socket.getInputStream());
+			
 			while ((currentAction != Action.Finish) && (currentAction != Action.WoodmanNotFound)) {
 				synchronized(synchronizer) {
 					synchronizer.wait();
 				}
 				m_request = (Request) in.readObject();
-				currentRequest=m_request.GetMethod();
-
-				switch (currentRequest) {
+			
+				switch (m_request.GetMethod()) {
 
 				case "CreateWoodman" :
 					m_wood.createWoodman(m_request.GetName(), points.get(Math.abs(random.nextInt(points.size()))), points.get(Math.abs(random.nextInt(points.size()))));				
