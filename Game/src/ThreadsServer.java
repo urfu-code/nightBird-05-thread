@@ -29,21 +29,15 @@ public class ThreadsServer extends Close implements Runnable  {
 		Random random = new Random();
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
-<<<<<<< HEAD
 
-=======
-			
->>>>>>> 9656234db585fadedfc55f05a113bb47d12ca81c
+
+
 			while ((currentAction != Action.Finish) && (currentAction != Action.WoodmanNotFound)) {
 				synchronized(synchronizer) {
 					synchronizer.wait();
 				}
 				m_request = (Request) in.readObject();
-<<<<<<< HEAD
 
-=======
-			
->>>>>>> 9656234db585fadedfc55f05a113bb47d12ca81c
 				switch (m_request.GetMethod()) {
 
 				case "CreateWoodman" :
