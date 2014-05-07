@@ -30,8 +30,6 @@ public class ThreadsServer extends Close implements Runnable  {
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
 
-
-
 			while ((currentAction != Action.Finish) && (currentAction != Action.WoodmanNotFound)) {
 				synchronized(synchronizer) {
 					synchronizer.wait();
