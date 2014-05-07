@@ -40,36 +40,29 @@ public class Server extends Close {
 		points.add(new Point(1,5));
 		points.add(new Point(2,7));
 		points.add(new Point(6,7));			
-		reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 		try {
-			while (true) {
-				if (reader.readLine().equals("start")) {
-					writer.write("Server started\r\n");
-					writer.flush();
-					break;
-				}
-				else {
-					writer.write("Type start\r\n");
-					writer.flush();
-				}
-			}
-			threadSynchronizer.start();
+			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+		}
+		catch (IOException e2) {
+			e2.printStackTrace();
+		}
+		try {
+		threadSynchronizer.start();
+			System.out.println("server started");
 			while (true) {
 				if (reader.ready()) {
+					System.out.println("I' m waiting for finish");
 					if (reader.readLine().equals("finish")) {
-						writer.write("You finished\r\n");
-						writer.flush();
+						System.out.println("You finished\r\n");
+					
 						threadSynchronizer.interrupt();
 						break;
 					}
-					else {
-						writer.write("Type start\r\n");
-						writer.flush();
-					}
+			
 				}
 				try {
-					thread = new Thread(new ThreadsServer(server.accept(), wood, points, synchronizer));
+					thread = new Thread(new ThreadsServer(socket, wood, points, synchronizer));
 					thread.start();
 				}
 				catch (SocketTimeoutException e) {
