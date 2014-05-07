@@ -49,6 +49,7 @@ public class Server extends Close {
 		}
 		try {
 		threadSynchronizer.start();
+<<<<<<< HEAD
 			System.out.println("Server started");
 			while (true) {
 					Stop s = new Stop();
@@ -64,6 +65,24 @@ public class Server extends Close {
 					thread.start();	 			
 					}
 			
+=======
+			System.out.println("server started");
+			while (true) {
+				if (reader.ready()) {
+					System.out.println("I' m waiting for finish");
+					if (reader.readLine().equals("finish")) {
+						System.out.println("You finished\r\n");
+					
+						threadSynchronizer.interrupt();
+						break;
+					}
+			
+				}
+				try {
+					thread = new Thread(new ThreadsServer(socket, wood, points, synchronizer));
+					thread.start();
+				}
+>>>>>>> 9656234db585fadedfc55f05a113bb47d12ca81c
 				catch (SocketTimeoutException e) {
 					continue;
 				}
