@@ -11,43 +11,40 @@ public class Client extends Close {
 	private static ObjectOutputStream out;
 
 	public static void main(String[] args) throws Exception{
-		System.out.println("Game started");	
 		Response m_response;
 		Request m_request;
 		Random random = new Random();
 		StringBuffer name = new StringBuffer();
-try {
-		socket = new Socket("localhost", 17396);			
-		out = new ObjectOutputStream(socket.getOutputStream());
+		try {
+			socket = new Socket("localhost", 17376);			
+			out = new ObjectOutputStream(socket.getOutputStream());
 
-		for (int i = 0; i < 6; i++) {
-			name.append((char)Math.abs(random.nextInt(128)));
-		}
+			for (int i = 0; i < 6; i++) {
+				name.append((char)Math.abs(random.nextInt(128)));
+			}
 
-		m_request = new Request(name.toString());
-		MyMouse Minni = new MyMouse(name.toString());  
-		out.writeObject(m_request);
-		out.flush();
-		Action currentAction = Action.Ok;
-		
+			m_request = new Request(name.toString());
+			MyMouse Minni = new MyMouse(name.toString());  
+			out.writeObject(m_request);
+			out.flush();
+			Action currentAction = Action.Ok;
+
 			while ((currentAction != Action.Finish) && (currentAction != Action.WoodmanNotFound)) {
 				Direction direction = Minni.NextMove(currentAction);
 				Request message = new Request(name.toString(), direction);
 				out.writeObject(message);
 				out.flush();
-				in = new ObjectInputStream(socket.getInputStream());
+				in =  new ObjectInputStream(socket.getInputStream());
 				m_response = (Response) in.readObject();
-				currentAction = m_response.GetAction();
-
-				
+				currentAction = m_response.GetAction();	
 			}
 			if (currentAction == Action.WoodmanNotFound) {
-					System.out.println("Woodman not found");
-				} 
+				System.out.println("Woodman not found");
+			} 
 
-				if (currentAction == Action.Finish) {
-					System.out.println("You reached finish");
-				}
+			if (currentAction == Action.Finish) {
+				System.out.println("You reached finish");
+			}
 			System.out.println("Game over");
 		}
 		catch (IOException e) {
