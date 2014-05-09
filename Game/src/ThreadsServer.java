@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -13,48 +14,60 @@ public class ThreadsServer extends Close implements Runnable  {
 	private PrintableWood m_wood;
 	private Request m_request;
 	private Response m_response;
+	private volatile HashMap<Integer, Thread> clientsList;
 	private LinkedList <Point> points= new LinkedList<Point>();
-	private Synchronizer synchronizer;
+	private Integer threadsID;
 
-	public  ThreadsServer(Socket s, PrintableWood wood, LinkedList <Point> p, Synchronizer sync) throws IOException {
+	public  ThreadsServer(Socket s, PrintableWood wood, HashMap <Integer, Thread> clients, LinkedList <Point> p, Integer threadID) throws IOException {
 		socket = s;
 		m_wood = wood;
+		clientsList = clients;
 		points = p;
-		synchronizer = sync;
+		threadsID = threadID;
 		}
 
+	
 	@Override
 	public void run() {
 		Action currentAction = Action.Ok;
 		Random random = new Random();
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
-<<<<<<< HEAD
 
-=======
-			
->>>>>>> 9656234db585fadedfc55f05a113bb47d12ca81c
 			while ((currentAction != Action.Finish) && (currentAction != Action.WoodmanNotFound)) {
-				synchronized(synchronizer) {
-					synchronizer.wait();
-				}
 				m_request = (Request) in.readObject();
-<<<<<<< HEAD
 
-=======
-			
->>>>>>> 9656234db585fadedfc55f05a113bb47d12ca81c
 				switch (m_request.GetMethod()) {
 
 				case "CreateWoodman" :
-					m_wood.createWoodman(m_request.GetName(), points.get(Math.abs(random.nextInt(points.size()))), points.get(Math.abs(random.nextInt(points.size()))));				
-
+				{
+					synchronized(m_wood) {
+						m_wood.createWoodman(m_request.GetName(), points.get(Math.abs(random.nextInt(points.size()))), points.get(Math.abs(random.nextInt(points.size()))));				
+		}
+					break;
+				}
+					
 				case "MoveWoodman" :
-					currentAction = m_wood.move(m_request.GetName(), m_request.GetDirection());
+				{
+					synchronized (clientsList.get(threadsID)) {
+						m_response = new Response(currentAction);
+						clientsList.get(threadsID).wait();
+					}
+					synchronized (m_wood) {
+						currentAction = m_wood.move(m_request.GetName(), m_request.GetDirection());
+						if(currentAction == Action.WoodmanNotFound) System.out.println("Woodman not found");
+						if(currentAction == Action.Finish) System.out.println("You reached finish");
+					}
 					out = new ObjectOutputStream(socket.getOutputStream());
-					m_response = new Response(currentAction);
 					out.writeObject(m_response);
-					out.flush();					 							
+					out.flush();
+					break;
+				}				 							
+				}
+				synchronized (clientsList) {
+					if ((currentAction == Action.WoodmanNotFound) || (currentAction == Action.Finish)) {
+						clientsList.remove(threadsID);
+					}
 				}
 			}
 			}
