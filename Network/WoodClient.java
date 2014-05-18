@@ -19,8 +19,11 @@ public class WoodClient {
 	private final static int PORT = 12345;
 	
 	@SuppressWarnings("resource")
-	public static void main(String[] args){
-		String name = "dyatel";
+	public static void main(String[] args) throws IOException{
+		if(args.length != 1){
+			throw new IOException("Wrong arguments");
+		}
+		String name = args[0];
 		try{
 			InetAddress address = InetAddress.getByName("localhost");
 			Socket serverConnection = new Socket(address, PORT);

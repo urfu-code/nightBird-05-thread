@@ -103,10 +103,12 @@ public class PrintableWood extends Wood {
 		try{
 			for (int j = 0; j < m_height; j++) {
 				point: for (int i = 0; i < m_width; i++) {
-					for (Woodman wm : super.m_woodmansSet.keySet()) {
-						if(wm.GetLocation().equals(new Point(i, j))){
-							os.write(m_wmSym.get(wm.GetName()));
-							continue point;
+					if(!super.m_woodmansSet.isEmpty()){
+						for (Woodman wm : super.m_woodmansSet.keySet()) {
+							if(wm.GetLocation().equals(new Point(i, j))){
+								os.write(m_wmSym.get(wm.GetName()));
+								continue point;
+							}
 						}
 					}
 					os.write(m_gWoodMap[i][j]);
@@ -115,7 +117,14 @@ public class PrintableWood extends Wood {
 				os.write(System.lineSeparator());
 			}
 			for (String wmN : m_wmSym.keySet()) {
-				os.write(m_wmSym.get(wmN) + " - " + wmN);
+				int lifes = -1;
+				for (Woodman wm : super.m_woodmansSet.keySet()) {
+					if(wm.GetName() == wmN){
+						lifes = wm.GetLifeCount();
+						break;
+					}
+				}
+				os.write(m_wmSym.get(wmN) + " - " + wmN + " " + lifes);
 				os.write(System.lineSeparator());
 			}
 			os.write("♥ - life");
@@ -134,6 +143,8 @@ public class PrintableWood extends Wood {
 	@Override
 	public Action move(String name, Direction direction) throws IOException {
 		Action action = super.move(name, direction);
+		if(action == Action.Finish || action == Action.WoodmanNotFound)
+			eraseWoodman(name);
 		return action;
 	}
 

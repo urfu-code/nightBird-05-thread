@@ -11,6 +11,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import WoodEngine.Action;
@@ -20,17 +22,25 @@ import WoodEngine.WoodLoader;
 
 public class MultiThreadServer {
 	
-	public static WoodLoader wl = new WoodLoader();
-	public volatile static PrintableWood wood;
+	private static WoodLoader wl = new WoodLoader();
+	private volatile static PrintableWood wood;
 	
-	public static final int PORT = 12345;
+	private static final int PORT = 12345;
 	
-	public static volatile LinkedList<Socket> bufferderClients = new LinkedList<Socket>();
-	public volatile static LinkedList<Thread> clients = new LinkedList<Thread>();
-	public static final Object sync = new Object();
-	public static ServerSocket server;
+	private static volatile LinkedList<Socket> bufferderClients = new LinkedList<Socket>();
+	private volatile static LinkedList<Thread> clients = new LinkedList<Thread>();
+	private static final Object sync = new Object();
+	private static ServerSocket server;
+	private static HashMap<Point, Point> locations = new HashMap<Point, Point>();
+	private static volatile Iterator<Point> loc;
+	
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException{
+		locations.put(new Point(17, 13), new Point(1, 13));
+		locations.put(new Point(1, 13), new Point(17, 13));
+//		locations.put(new Point(3, 13), new Point(1, 9));
+//		locations.put(new Point(1, 9), new Point(3, 13));
+		loc = locations.keySet().iterator();
 		wood = (PrintableWood) wl.LoadPrntbleWood(new FileInputStream(new File("maze")), System.out);
 		server = new ServerSocket(PORT);
 		Thread clBuffThread = new Thread(new ClientBuffer());
@@ -55,7 +65,7 @@ public class MultiThreadServer {
 			}
 			wood.printWood();
 			try {
-			    Thread.sleep(500);
+			    Thread.sleep(100);
 			} catch(InterruptedException ex) {
 			    Thread.currentThread().interrupt();
 			}
@@ -86,8 +96,9 @@ public class MultiThreadServer {
 		private Action act;
 		private int steps = 0;
 		private Object inpMessage;
+		private String name;
 		
-		public ClientHandler(Socket inpClient){
+		private ClientHandler(Socket inpClient){
 			client = inpClient;
 		}
 		
@@ -102,8 +113,18 @@ public class MultiThreadServer {
 						inpMessage = ois.readObject();
 						if(inpMessage.getClass() == NetCreateInfo.class){
 							NetCreateInfo create = (NetCreateInfo) inpMessage;
-							wood.createWoodman(create.getName(), new Point(17, 13), new Point(1, 13));
-							System.out.println("Woodman " + create.getName() + " created");
+							synchronized (wood) {
+								synchronized (loc) {
+									if(!loc.hasNext()){
+										loc = locations.keySet().iterator();
+									}
+									Point st = loc.next();
+									Point fin = locations.get(st);
+									wood.createWoodman(create.getName(), st, fin);
+								}
+							}
+							name = create.getName();
+							System.out.println("Woodman " + name + " created");
 							synchronized (sync) {
 								sync.wait();
 							}
@@ -111,8 +132,11 @@ public class MultiThreadServer {
 						}
 						if(inpMessage.getClass() == NetDirectionInfo.class){
 							NetDirectionInfo move = (NetDirectionInfo) inpMessage;
-							act = wood.move(move.getName(), move.getDirection());
+							synchronized (wood) {
+								act = wood.move(move.getName(), move.getDirection());
+							}
 							steps++;
+							name = move.getName();
 							NetActionInfo newActInfo = new NetActionInfo(move.getName(), act);
 							oos.writeObject(newActInfo);
 							oos.flush();
@@ -120,11 +144,11 @@ public class MultiThreadServer {
 							throw new IOException("Illegal input object " + inpMessage.getClass());
 						}
 						if(act == Action.Finish){
-							System.out.println("YOU FINISHED in " + steps);
+							System.out.println(name + " FINISHED in " + steps);
 							break;
 						}
 						if(act == Action.WoodmanNotFound){
-							System.out.println("LOL YOU DIED in " + steps);
+							System.out.println("LOL " + name + " DIED in " + steps);
 							break;
 						}
 						synchronized (sync) {

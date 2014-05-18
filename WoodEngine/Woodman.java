@@ -68,5 +68,10 @@ public class Woodman implements IWoodman{
         Woodman woodman = (Woodman)this;
         return woodman.GetName().hashCode() + 17*37;
     }
+	
+	@Override
+	public String toString(){
+        return this.GetName() + " " + this.GetLocation();
+    }
 
 }

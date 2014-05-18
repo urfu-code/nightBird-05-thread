@@ -55,7 +55,9 @@ public class Point {
 	
 	@Override
 	public int hashCode(){
-        return Integer.valueOf(x) ^ Integer.valueOf(y);
+		long bits = java.lang.Double.doubleToLongBits(getX());
+	    bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
+	    return (((int) bits) ^ ((int) (bits >> 32)));
     }
 	
 	@Override

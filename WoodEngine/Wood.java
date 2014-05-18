@@ -10,7 +10,7 @@ public class Wood implements IWood {
 	 * 3 - life
 	 */
 	protected final char[][] m_woodMap;
-	protected HashMap<Woodman, Point> m_woodmansSet;
+	protected volatile HashMap<Woodman, Point> m_woodmansSet;
 	
 	public Wood (Character[] objs, int height, int width){
 		m_woodmansSet = new HashMap<Woodman, Point>();
@@ -25,7 +25,7 @@ public class Wood implements IWood {
 	protected void eraseWoodman(String name){
 		for (Woodman curWM : m_woodmansSet.keySet()) {
 			if (curWM.GetName() == name) {
-				m_woodmansSet.remove(curWM);
+				Point p = m_woodmansSet.remove(curWM);
 			}
 		}
 	}
@@ -59,8 +59,10 @@ public class Wood implements IWood {
 				}
 				case '0': { // floor
 					curWM.SetLocation(wannabeLoc);
-					if(curWM.GetLocation().equals(m_woodmansSet.get(curWM)))
+					if(curWM.GetLocation().equals(m_woodmansSet.get(curWM))){
+						eraseWoodman(name);
 						return Action.Finish;
+					}
 					return Action.Ok;
 				}
 				case '2': { // trap
