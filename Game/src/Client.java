@@ -3,6 +3,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Client extends Close {
 
@@ -13,15 +14,16 @@ public class Client extends Close {
 	public static void main(String[] args) throws Exception{
 		Response m_response;
 		Request m_request;
-		Random random = new Random();
-		StringBuffer name = new StringBuffer();
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Mouse name : ");
+		String name = scanner.nextLine();
+
 		try {
-			socket = new Socket("localhost", 17376);			
+			socket = new Socket("localhost", 17376);
 			out = new ObjectOutputStream(socket.getOutputStream());
 
-			for (int i = 0; i < 6; i++) {
-				name.append((char)Math.abs(random.nextInt(128)));
-			}
+
+			//StringBuffer name = new StringBuffer();
 
 			m_request = new Request(name.toString());
 			MyMouse Minni = new MyMouse(name.toString());  

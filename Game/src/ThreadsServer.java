@@ -14,7 +14,7 @@ public class ThreadsServer extends Close implements Runnable  {
 	private PrintableWood m_wood;
 	private Request m_request;
 	private Response m_response;
-	private volatile HashMap<Integer, Thread> clientsList;
+	private volatile HashMap <Integer, Thread> clientsList;
 	private LinkedList <Point> points= new LinkedList<Point>();
 	private Integer threadsID;
 
@@ -24,9 +24,8 @@ public class ThreadsServer extends Close implements Runnable  {
 		clientsList = clients;
 		points = p;
 		threadsID = threadID;
-		}
+	}
 
-	
 	@Override
 	public void run() {
 		Action currentAction = Action.Ok;
@@ -43,10 +42,10 @@ public class ThreadsServer extends Close implements Runnable  {
 				{
 					synchronized(m_wood) {
 						m_wood.createWoodman(m_request.GetName(), points.get(Math.abs(random.nextInt(points.size()))), points.get(Math.abs(random.nextInt(points.size()))));				
-		}
+					}
 					break;
 				}
-					
+
 				case "MoveWoodman" :
 				{
 					synchronized (clientsList.get(threadsID)) {
@@ -55,8 +54,12 @@ public class ThreadsServer extends Close implements Runnable  {
 					}
 					synchronized (m_wood) {
 						currentAction = m_wood.move(m_request.GetName(), m_request.GetDirection());
-						if(currentAction == Action.WoodmanNotFound) System.out.println("Woodman not found");
-						if(currentAction == Action.Finish) System.out.println("You reached finish");
+						if (currentAction == Action.WoodmanNotFound) {
+							System.out.println("Woodman not found");
+						}
+						if (currentAction == Action.Finish) {
+							System.out.println("You reached finish");
+						}
 					}
 					out = new ObjectOutputStream(socket.getOutputStream());
 					out.writeObject(m_response);
@@ -70,7 +73,7 @@ public class ThreadsServer extends Close implements Runnable  {
 					}
 				}
 			}
-			}
+		}
 		catch (IOException e) {
 			e.printStackTrace();
 		} 
