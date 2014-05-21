@@ -23,23 +23,20 @@ public class Server extends Close {
 
 	public static void main(String[] args) throws CodeException, IOException {
 		File file=new File("world.txt");
+		LinkedList<Point> points = new LinkedList<Point>();
+		points.add(new Point(1,2));
+		points.add(new Point(1,3));
+		points.add(new Point(1,4));
+		points.add(new Point(1,5));
+		points.add(new Point(2,7));
+		points.add(new Point(6,7));
 		try {
 			server = new ServerSocket(17376);
 			instream = new FileInputStream(file);
-			socket = server.accept();
 			PrintableWoodLoader W = new PrintableWoodLoader();
-			PrintableWood wood = W.PrintableWoodLoad(instream,System.out);			
-			LinkedList<Point> points = new LinkedList<Point>();
+			PrintableWood wood = W.PrintableWoodLoad(instream,System.out);					
 			Synchronizer synchronizer = new Synchronizer(clients);
 			Thread threadSynchronizer = new Thread(synchronizer);
-			
-			points.add(new Point(1,2));
-			points.add(new Point(1,3));
-			points.add(new Point(1,4));
-			points.add(new Point(1,5));
-			points.add(new Point(2,7));
-			points.add(new Point(6,7));		
-
 			threadSynchronizer.start();
 			Stop s = new Stop();
 			s.start();
@@ -72,7 +69,6 @@ public class Server extends Close {
 				}
 			}
 		}
-
 		catch (IOException e) {
 			e.printStackTrace();
 		}
