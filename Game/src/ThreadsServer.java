@@ -25,6 +25,10 @@ public class ThreadsServer extends Close implements Runnable  {
 		points = p;
 		threadsID = threadID;
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 897ae09cc9a1c834c56c31cfb03f735d70c76e76
 
 	@Override
 	public void run() {

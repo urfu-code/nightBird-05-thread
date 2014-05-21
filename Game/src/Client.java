@@ -21,10 +21,6 @@ public class Client extends Close {
 		try {
 			socket = new Socket("localhost", 17376);
 			out = new ObjectOutputStream(socket.getOutputStream());
-
-
-			//StringBuffer name = new StringBuffer();
-
 			m_request = new Request(name.toString());
 			MyMouse Minni = new MyMouse(name.toString());  
 			out.writeObject(m_request);
