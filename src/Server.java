@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Server{
-	volatile static HashMap<Integer, Thread> clients = new HashMap<Integer, Thread>();
+	volatile static ConcurrentHashMap<Integer, Thread> clients = new ConcurrentHashMap<Integer, Thread>();
 	public static ArrayList<Point> points;
 	private static ServerSocket serverSocket;
 	
@@ -17,10 +16,10 @@ public class Server{
 		points = new ArrayList<>();
 		points.add(new Point(1,1));
 		points.add(new Point(6,2));
-		points.add(new Point(2,3));
-		points.add(new Point(4,3));
-		points.add(new Point(3,6));
-		points.add(new Point(4,4));
+		points.add(new Point(2,2));
+		points.add(new Point(1,6));
+
+		int identifier = 0;
 		try {
 			File file = new File("wood.txt");
 			MyWoodLoader loader = new MyWoodLoader();
@@ -34,21 +33,16 @@ public class Server{
 			
 			Exit stop = new Exit();
 			stop.start();
-			
-			serverSocket.setSoTimeout(1000);
-			
+
 			while (true) {
-				Integer identifier;
 				Thread mThread;
 				
 				if (stop.flag) {
 					System.out.println("Exit");
-					throw new Exception("Exit");
 				}
 				
 				try {
-					Random random = new Random();
-					identifier = Math.abs(random.nextInt());
+					identifier++;
 					mThread = new Thread(new ServerThread(serverSocket.accept(), wood, points, clients, identifier));
 				} catch (SocketTimeoutException e) {
 					continue;

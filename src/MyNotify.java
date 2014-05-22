@@ -1,10 +1,12 @@
-import java.util.HashMap;
+
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MyNotify implements Runnable {
-	private HashMap<Integer, Thread> clients;
+	private ConcurrentHashMap<Integer, Thread> clients;
 
-	public MyNotify(HashMap<Integer, Thread> clients) {
+
+	public MyNotify(ConcurrentHashMap<Integer, Thread> clients) {
 		this.clients = clients;
 	}
 

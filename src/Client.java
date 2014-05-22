@@ -29,6 +29,7 @@ public class Client {
 			
 			Action action = Action.Ok;
 			
+			
 			while (true) {
 				
 				if ((action == Action.Finish) && (action == Action.WoodmanNotFound)){
@@ -39,7 +40,6 @@ public class Client {
 				MessageServer message = new MessageServer("move", name, direction);
 				out_stream.writeObject(message);
 				out_stream.flush();
-				
 				in_stream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 				try {				
 					MessageClient messageClient = (MessageClient) in_stream.readObject();

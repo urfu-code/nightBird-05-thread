@@ -6,8 +6,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ServerThread implements Runnable{
@@ -15,11 +15,11 @@ public class ServerThread implements Runnable{
 	private ObjectOutputStream outStream;
 	private Socket socket;
 	private PrintableWood wood;
-	private volatile HashMap<Integer, Thread> clients;
+	private volatile ConcurrentHashMap<Integer, Thread> clients;
 	private ArrayList<Point> points;
 	private Integer threadID;
 
-	public ServerThread(Socket socket, PrintableWood wood, ArrayList<Point> points, HashMap<Integer, Thread> clients, Integer threadID) throws IOException {
+	public ServerThread(Socket socket, PrintableWood wood, ArrayList<Point> points, ConcurrentHashMap<Integer, Thread> clients, Integer threadID) throws IOException {
 		this.socket = socket;
 		this.wood = wood;
 		this.points = points;
@@ -41,9 +41,8 @@ public class ServerThread implements Runnable{
 					}
 					break;
 				case "move" :
-					MessageClient messageClient;
+					MessageClient messageClient = new MessageClient(action);
 					synchronized (clients.get(threadID)) {
-						messageClient = new MessageClient(action);
 						clients.get(threadID).wait();
 					}
 					synchronized(wood){
