@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ThreadsServer extends Close implements Runnable  {
 
@@ -14,21 +15,17 @@ public class ThreadsServer extends Close implements Runnable  {
 	private PrintableWood m_wood;
 	private Request m_request;
 	private Response m_response;
-	private volatile HashMap <Integer, Thread> clientsList;
+	private volatile ConcurrentHashMap<Integer, Thread> clientsList;
 	private LinkedList <Point> points= new LinkedList<Point>();
 	private Integer threadsID;
 
-	public  ThreadsServer(Socket s, PrintableWood wood, HashMap <Integer, Thread> clients, LinkedList <Point> p, Integer threadID) throws IOException {
+	public  ThreadsServer(Socket s, PrintableWood wood, ConcurrentHashMap<Integer, Thread> clients, LinkedList <Point> p, Integer threadID) throws IOException {
 		socket = s;
 		m_wood = wood;
 		clientsList = clients;
 		points = p;
 		threadsID = threadID;
 	}
-<<<<<<< HEAD
-=======
-
->>>>>>> 897ae09cc9a1c834c56c31cfb03f735d70c76e76
 
 	@Override
 	public void run() {

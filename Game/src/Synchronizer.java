@@ -1,13 +1,13 @@
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Synchronizer implements Runnable {
 
-	private HashMap<Integer, Thread> сlients;
+	private ConcurrentHashMap<Integer, Thread> сlients;
 
-	public Synchronizer(HashMap<Integer, Thread> сlientsList) {
-		this.сlients = сlientsList;
+	public Synchronizer(ConcurrentHashMap<Integer, Thread> clients) {
+		this.сlients = clients;
 	}
 
 	@Override

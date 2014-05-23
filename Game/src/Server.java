@@ -10,6 +10,7 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Server extends Close {
 	private static Socket socket;
@@ -19,7 +20,7 @@ public class Server extends Close {
 	private static InputStream instream;
 	Request m_request;
 	Response m_response;
-	volatile static HashMap<Integer, Thread> clients = new HashMap<Integer, Thread>();
+	volatile static ConcurrentHashMap<Integer, Thread> clients = new ConcurrentHashMap<Integer, Thread>();
 
 	public static void main(String[] args) throws CodeException, IOException {
 		File file=new File("world.txt");
@@ -40,24 +41,21 @@ public class Server extends Close {
 			threadSynchronizer.start();
 			Stop s = new Stop();
 			s.start();
-
-			server.setSoTimeout(1000);
-
+			int k=1;
 			while (true) {
 				Integer threadID;
 				Thread thread;
 				if (s.flag) {
 					System.out.println("Server stopped");
-					throw new Stopper("Server stopped");
 				}
 				try {
-					Random random = new Random();
-					threadID = Math.abs(random.nextInt());
+					threadID=k;
 					thread = new Thread(new ThreadsServer(server.accept(), wood, clients, points, threadID));
 				} catch (SocketTimeoutException e) {
 					continue;
 				}
 				synchronized (clients) {
+					k++;
 					clients.put(threadID, thread);
 				}					
 				thread.start();

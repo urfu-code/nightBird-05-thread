@@ -14,22 +14,23 @@ public class Client extends Close {
 	public static void main(String[] args) throws Exception{
 		Response m_response;
 		Request m_request;
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("Mouse name : ");
-		String name = scanner.nextLine();
-
+		StringBuffer name = new StringBuffer();
+		Random random = new Random();
 		try {
+			for (int i = 0; i < 6; i++) {
+				name.append((char) Math.abs(random.nextInt(128)));
+			}
+			
 			socket = new Socket("localhost", 17376);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			m_request = new Request(name.toString());
-			MyMouse Minni = new MyMouse(name.toString());  
+			MyMouse Minni = new MyMouse(name.toString());	 
 			out.writeObject(m_request);
 			out.flush();
 			Action currentAction = Action.Ok;
-
 			while ((currentAction != Action.Finish) && (currentAction != Action.WoodmanNotFound)) {
 				Direction direction = Minni.NextMove(currentAction);
-				Request message = new Request(name.toString(), direction);
+				Request message = new Request(Minni.GetName(), direction);
 				out.writeObject(message);
 				out.flush();
 				in =  new ObjectInputStream(socket.getInputStream());
