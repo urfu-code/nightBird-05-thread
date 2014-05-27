@@ -1,5 +1,3 @@
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -7,7 +5,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ServerThread implements Runnable{
@@ -15,50 +12,41 @@ public class ServerThread implements Runnable{
 	private ObjectOutputStream outStream;
 	private Socket socket;
 	private PrintableWood wood;
-	private volatile ConcurrentHashMap<Integer, Thread> clients;
 	private ArrayList<Point> points;
-	private Integer threadID;
+	private Synchronizer mark;
 
-	public ServerThread(Socket socket, PrintableWood wood, ArrayList<Point> points, ConcurrentHashMap<Integer, Thread> clients, Integer threadID) throws IOException {
+	public ServerThread(Socket socket, PrintableWood wood, ArrayList<Point> points, Synchronizer mark) throws IOException {
 		this.socket = socket;
 		this.wood = wood;
 		this.points = points;
-		this.clients = clients;
-		this.threadID = threadID;
+		this.mark = mark;
+		inStream = new ObjectInputStream(socket.getInputStream());
+		outStream = new ObjectOutputStream(socket.getOutputStream());
 	}
 
 	@Override
 	public void run() {
 		Action action = Action.Ok;
 		try {
-			inStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 			while (action != Action.WoodmanNotFound && action != Action.Finish) {
 				MessageServer messageServer = (MessageServer)inStream.readObject();
 				switch (messageServer.getMethod()) {
 				case "createWoodman" :
-					synchronized(wood){
-						wood.createWoodman(messageServer.getName(), points.get(Math.abs(new Random().nextInt(points.size()))), points.get(Math.abs(new Random().nextInt(points.size()))));
-					}
+					wood.createWoodman(messageServer.getName(), points.get(Math.abs(new Random().nextInt(points.size()))), points.get(Math.abs(new Random().nextInt(points.size()))));
 					break;
 				case "move" :
 					MessageClient messageClient = new MessageClient(action);
-					synchronized (clients.get(threadID)) {
-						clients.get(threadID).wait();
+					synchronized (mark) {
+						mark.wait();
 					}
-					synchronized(wood){
+					synchronized (wood) {
 						action = wood.move(messageServer.getName(), messageServer.getDirection());
-						if(action == Action.WoodmanNotFound) System.out.println("The player died.:(");
-						if(action == Action.Finish) System.out.println("We have a winner!:)");
 					}
-					outStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+					if(action == Action.WoodmanNotFound) System.out.println("The player died.:(");
+					if(action == Action.Finish) System.out.println("We have a winner!:)");
 					outStream.writeObject(messageClient);
 					outStream.flush();
 					break;
-				}
-			}
-			synchronized (clients) {
-				if ((action == Action.WoodmanNotFound) || (action == Action.Finish)) {
-					clients.remove(threadID);
 				}
 			}
 		}

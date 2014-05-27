@@ -12,18 +12,19 @@ public class MyNotify implements Runnable {
 
 	@Override
 	public void run() {
+		Iterator<Integer> keySetIterator;
 		while (true) {			
-			Iterator<Integer> keySetIterator = clients.keySet().iterator();
+			keySetIterator = clients.keySet().iterator();
 			while (keySetIterator.hasNext()) {
 				Integer key = keySetIterator.next();
 				synchronized (clients.get(key)) {
 					clients.get(key).notify();
 				}		  
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			}
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}

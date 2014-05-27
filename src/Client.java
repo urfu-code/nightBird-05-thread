@@ -1,5 +1,3 @@
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -21,15 +19,12 @@ public class Client {
 			String name = scanner.nextLine();
 			MyMouse mouse = new MyMouse();	
 			socket = new Socket("localhost", 25436);
-			out_stream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));;
-			
+			out_stream = new ObjectOutputStream(socket.getOutputStream());
+			in_stream = new ObjectInputStream(socket.getInputStream());
 			MessageServer messageServer = new MessageServer("createWoodman", name);
 			out_stream.writeObject(messageServer);
 			out_stream.flush();
-			
 			Action action = Action.Ok;
-			
-			
 			while (true) {
 				
 				if ((action == Action.Finish) && (action == Action.WoodmanNotFound)){
@@ -37,11 +32,10 @@ public class Client {
 				}
 				
 				Direction direction = mouse.NextMove(action);
-				MessageServer message = new MessageServer("move", name, direction);
+				MessageServer message = new MessageServer("move", messageServer.getName(), direction);
 				out_stream.writeObject(message);
 				out_stream.flush();
-				in_stream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
-				try {				
+				try {			
 					MessageClient messageClient = (MessageClient) in_stream.readObject();
 					action = messageClient.getAction();
 				} catch (ClassNotFoundException e) {
