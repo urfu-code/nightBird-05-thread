@@ -8,8 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import server.MessageClient;
 import server.MessageServer;
@@ -22,11 +22,11 @@ public class My_Thread implements Runnable{
 	private ObjectOutputStream outStream;
 	private Socket socket;
 	private PrintWood wood;
-	private volatile HashMap<Integer, Thread> clients;
+	private volatile ConcurrentHashMap<Integer, Thread> clients;
 	private ArrayList<Point> points;
 	private Integer threadID;
 
-	public My_Thread(Socket socket, PrintWood wood, ArrayList<Point> points, HashMap<Integer, Thread> clients, Integer threadID) throws IOException {
+	public My_Thread(Socket socket, PrintWood wood, ArrayList<Point> points, ConcurrentHashMap<Integer, Thread> clients, Integer threadID) throws IOException {
 		this.socket = socket;
 		this.wood = wood;
 		this.points = points;
@@ -44,26 +44,20 @@ public class My_Thread implements Runnable{
 				switch (messageServer.getMethod()) {
 				case "createWoodman" :
 					synchronized(wood){
-						Random r1 = new Random();
-						Random r2 = new Random();
-						int s = r1.nextInt(points.size());
-						int f = r2.nextInt(points.size());
-						Point finish = points.get(f);
-						Point start = points.get(s);
-						wood.createWoodman(messageServer.getName(), start, finish);
+						wood.createWoodman(messageServer.getName(), points.get(Math.abs(new Random().nextInt(points.size()))), points.get(Math.abs(new Random().nextInt(points.size()))));
 					}
 					break;
 				case "move" :
-					MessageClient messageClient;
+					MessageClient messageClient= new MessageClient(action);
 					synchronized (clients.get(threadID)) {
-						messageClient = new MessageClient(action);
-						clients.get(threadID).wait();
+						clients.get(threadID).wait();//ожидание
+						//this.wait();
 					}
 					synchronized(wood){
 						action = wood.move(messageServer.getName(), messageServer.getDirection());
-						if(action == Action.WoodmanNotFound) System.out.println("Мышь умерла!:(");
-						if(action == Action.Finish) System.out.println("Мышь дошла до финиша!:)");
 					}
+					if(action == Action.WoodmanNotFound) System.out.println("Мышь умерла!:(");
+					if(action == Action.Finish) System.out.println("Мышь дошла до финиша!:)");
 					outStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 					outStream.writeObject(messageClient);
 					outStream.flush();

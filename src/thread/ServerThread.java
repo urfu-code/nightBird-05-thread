@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import wood.My_WoodLoader;
 import wood.Point;
@@ -16,7 +15,7 @@ import wood.PrintWood;
 
 public class ServerThread{
 	My_WoodLoader loader;
-	volatile static HashMap<Integer, Thread> clients = new HashMap<Integer, Thread>();
+	volatile static ConcurrentHashMap<Integer, Thread> clients = new ConcurrentHashMap<Integer, Thread>();
 	
 	public static void main(String[] args) {
 	//содержит три строчки старта и финиша
@@ -29,6 +28,7 @@ public class ServerThread{
 		File file = new File("myWood.txt");
 		ServerSocket serverSocket = null;
 		FileInputStream stream = null;
+		int counter=0;
 		try {
 			serverSocket = new ServerSocket(25436);
 			//System.out.println("Client connected");
@@ -47,16 +47,15 @@ public class ServerThread{
 			while (true) {
 				if (work.flag) {
 					System.out.println("server is stopped");
-					throw new Exception("server is stopped");
+					System.exit(0);
 				}
 				Integer threadID;
 				Thread mThread;
 				try {
-					Random random = new Random();
-					threadID = Math.abs(random.nextInt());
+					threadID = counter++;
 					mThread = new Thread(new My_Thread(serverSocket.accept(), wood, points, clients, threadID));
 				} catch (SocketTimeoutException e) {
-					continue;
+					continue;//пропуск операторов в цикле
 				}
 
 				synchronized (clients) {

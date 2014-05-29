@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Random;
 import java.util.Scanner;
 
 import server.MessageClient;
@@ -30,23 +29,17 @@ public class Client{
 		try{
 			socket = new Socket("localhost", 25436);
 			outStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-			
 			MessageServer messageServer = new MessageServer("createWoodman", name);
 			outStream.writeObject(messageServer);
 			outStream.flush();
-			
 			Action action = Action.Ok;
 			while (!(action == Action.WoodmanNotFound) && !(action == Action.Finish)) {
 				Direction direction = mouse.NextMove(action);
 				MessageServer message = new MessageServer("move", name.toString(), direction);
 				outStream.writeObject(message);
-				outStream.flush();
-					
+				outStream.flush();				
 				inStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 				MessageClient messageClient = (MessageClient) inStream.readObject();
-				//action = messageClient.getAction();
-				if(action == Action.WoodmanNotFound) System.out.println("Мышь умерла!:(");
-				if(action == Action.Finish) System.out.println("Мышь дошла до финиша!:)");
 				action = messageClient.getAction();
 			}
 		}catch (IOException e) {
