@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,7 +55,7 @@ public class ThreadsServer extends Close implements Runnable  {
 					synchronized (m_wood) {
 						currentAction = m_wood.move(m_request.GetName(), m_request.GetDirection());
 						if (currentAction == Action.WoodmanNotFound) {
-							System.out.println("Woodman not found");
+							System.out.println("You didn't reach finish");
 						}
 						if (currentAction == Action.Finish) {
 							System.out.println("You reached finish");

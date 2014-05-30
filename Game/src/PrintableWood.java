@@ -50,16 +50,22 @@ public class PrintableWood extends MyWood {
 
 	@Override
 	public Action move(String name, Direction direction) throws IOException, CodeException {
+		
 		Point startLocation = super.getLocation(name);
+		if (startLocation!=null){
 		printableWood[startLocation.getX()][startLocation.getY()] = getSymbolOfWood(startLocation.getX(), startLocation.getY());
+		}  else return null;
 		Action result = super.move(name, direction);
+		 
 		Point newLocation = super.getLocation(name);
+		if (newLocation!=null){
 		printableWood[newLocation.getX()][newLocation.getY()] = m_woodmans.get(name);
 		if (result == Action.WoodmanNotFound) {
 			m_woodmanListOfSymbols.add(m_woodmans.remove(name));
 		}
 		PrintWood();
 		return result;
+		} else return null;
 	}
 
 	private char getSymbolOfWood(int x, int y) {

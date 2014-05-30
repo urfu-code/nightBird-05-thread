@@ -7,9 +7,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server extends Close {
@@ -41,12 +39,14 @@ public class Server extends Close {
 			threadSynchronizer.start();
 			Stop s = new Stop();
 			s.start();
+			
 			int k=1;
 			while (true) {
 				Integer threadID;
-				Thread thread;
+				Thread thread = null;
 				if (s.flag) {
 					System.out.println("Server stopped");
+					thread.interrupt();
 				}
 				try {
 					threadID=k;

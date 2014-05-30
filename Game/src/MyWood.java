@@ -25,8 +25,9 @@ public  class MyWood implements Wood {
 
 	protected Point getLocation(String name) throws CodeException {
 		if (!m_woodmanList.containsKey(name)) {
-			throw new CodeException("Woodman not found");
-		}
+			System.out.println("Woodman not found");
+			return null;
+		} else
 		return m_woodmanList.get(name).GetLocation();
 	}
 

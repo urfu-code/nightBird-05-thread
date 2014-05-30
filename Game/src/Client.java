@@ -3,7 +3,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Random;
-import java.util.Scanner;
 
 public class Client extends Close {
 
@@ -38,7 +37,7 @@ public class Client extends Close {
 				currentAction = m_response.GetAction();	
 			}
 			if (currentAction == Action.WoodmanNotFound) {
-				System.out.println("Woodman not found");
+				System.out.println("You didn't reach finish");
 			} 
 
 			if (currentAction == Action.Finish) {
