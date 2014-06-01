@@ -27,9 +27,6 @@ public class MyWoodClient {
 			Chatbox messageToServer = new Chatbox("create mau5",name);
 			writer.writeObject(messageToServer);
 			writer.flush();
-			//writer.writeObject(new Chatbox(Action.Ok));
-			//writer.flush();
-			//reader = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 			reader = createStream();
 			Action action = Action.Ok;
 			while (action != Action.Finish && action != Action.WoodmanNotFound) {
@@ -37,8 +34,6 @@ public class MyWoodClient {
 				messageToServer = new Chatbox("move mau5",name,direction);
 				writer.writeObject(messageToServer);
 				writer.flush();
-				//reader = createStream();
-				//reader = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 				Chatbox messageToClient = (Chatbox) reader.readObject();
 				action = messageToClient.getAction();
 			}

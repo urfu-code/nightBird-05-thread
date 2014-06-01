@@ -117,6 +117,7 @@ public class Deadmau5 implements Mau5 {
 		System.out.print("\n"+mau5loc.getY()+" "+mau5loc.getX()+" last action="+lastAct+", next direction="+lastDir+", lifeCounter="+lifeCounter+"\n");
 	}
 
+	@SuppressWarnings("unchecked")
 	public void changeMap () {
 		int Mau5_x = mau5loc.getX();		
 		int Mau5_y = mau5loc.getY();

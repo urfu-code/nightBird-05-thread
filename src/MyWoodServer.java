@@ -1,10 +1,9 @@
-
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -26,7 +25,8 @@ public class MyWoodServer {
 			System.out.println("Hello, mau5!\n"+System.getProperty("line.separator"));
 			FileInputStream stream = new FileInputStream(file);
 			MyWoodLoader wood_loader = new MyWoodLoader();
-			MyPrintableWood wood = (MyPrintableWood)wood_loader.Load(stream, System.out);
+			OutputStream out = System.out;
+			MyPrintableWood wood = (MyPrintableWood)wood_loader.Load(stream, out);
 			Destroyter d = new Destroyter();
 			d.close(stream);		
 			reader = new ObjectInputStream(socket.getInputStream());;
@@ -40,7 +40,6 @@ public class MyWoodServer {
 					messageToServer = (Chatbox)reader.readObject();
 					if (messageToServer.getCommand().equals("move mau5")) {
 						action = wood.move(messageToServer.getName(), messageToServer.getDirection());
-						//writer = new ObjectOutputStream(socket.getOutputStream());
 						Chatbox messageToClient = new Chatbox(action);
 						writer.writeObject(messageToClient);
 						writer.flush();
@@ -55,7 +54,7 @@ public class MyWoodServer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				d.close(System.out);
+				d.close(out);
 				if (socket != null) d.close(socket);
 				if (serverSocket != null) d.close(serverSocket);
 				if (writer != null) d.close(writer);
