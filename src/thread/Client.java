@@ -28,17 +28,19 @@ public class Client{
 		My_Mouse mouse = new My_Mouse();
 		try{
 			socket = new Socket("localhost", 25436);
-			outStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+			System.out.println("Всё создал\n");
+			outStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream())); 
 			MessageServer messageServer = new MessageServer("createWoodman", name);
 			outStream.writeObject(messageServer);
 			outStream.flush();
+			inStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+			messageServer = (MessageServer)inStream.readObject();
 			Action action = Action.Ok;
 			while (!(action == Action.WoodmanNotFound) && !(action == Action.Finish)) {
 				Direction direction = mouse.NextMove(action);
 				MessageServer message = new MessageServer("move", name.toString(), direction);
 				outStream.writeObject(message);
 				outStream.flush();				
-				inStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 				MessageClient messageClient = (MessageClient) inStream.readObject();
 				action = messageClient.getAction();
 			}

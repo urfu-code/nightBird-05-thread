@@ -39,26 +39,28 @@ public class My_Thread implements Runnable{
 		Action action = Action.Ok;
 		try {
 			inStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+			outStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));	
 			while (action != Action.WoodmanNotFound && action != Action.Finish) {
 				MessageServer messageServer = (MessageServer)inStream.readObject();
 				switch (messageServer.getMethod()) {
 				case "createWoodman" :
 					synchronized(wood){
 						wood.createWoodman(messageServer.getName(), points.get(Math.abs(new Random().nextInt(points.size()))), points.get(Math.abs(new Random().nextInt(points.size()))));
+						messageServer = new MessageServer("created", messageServer.getName());
+						outStream.writeObject(messageServer);
+						outStream.flush();
 					}
 					break;
 				case "move" :
 					MessageClient messageClient= new MessageClient(action);
 					synchronized (clients.get(threadID)) {
 						clients.get(threadID).wait();//ожидание
-						//this.wait();
 					}
 					synchronized(wood){
 						action = wood.move(messageServer.getName(), messageServer.getDirection());
 					}
 					if(action == Action.WoodmanNotFound) System.out.println("Мышь умерла!:(");
 					if(action == Action.Finish) System.out.println("Мышь дошла до финиша!:)");
-					outStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 					outStream.writeObject(messageClient);
 					outStream.flush();
 					break;
